@@ -9,6 +9,8 @@ Author : @abhishekabhishek
 import numpy as np
 import scipy
 
+from tensornetwork import FiniteMPS
+
 from MPScumulant import MPS_c
 
 
@@ -90,7 +92,15 @@ def are_isometries(mps, reshape_axis: int = 0):
 
     print('idx, core tensor shape, left isometry, right isometry')
 
-    for i, tn_core in enumerate(mps.matrices):
+    if isinstance(mps, MPS_c):
+        tn_cores = mps.matrices
+    elif isinstance(mps, FiniteMPS):
+        tn_cores = mps.tensors
+    else:
+        raise NotImplementedError("mps needs to be either a MPScumulant.MPS_c\
+             or tensornetwork.FiniteMPS object")
+
+    for i, tn_core in enumerate(tn_cores):
         # convert the order-3 core tensor to a matrix
         # merge along the left virtual axis
         if reshape_axis == 0:
