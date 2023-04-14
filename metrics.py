@@ -28,7 +28,7 @@ def filter_probs(probs, data):
     """
     assert len(data.shape) == 2, f"the data matrix is not 2-dimensional : \
         {data.shape}"
-    idxs = np.dot(data, 2**np.arange(data.shape[1])[::-1])
+    idxs = jnp.dot(data, 2**jnp.arange(data.shape[1])[::-1])
     return probs[idxs]
 
 
@@ -73,7 +73,8 @@ def kl_divergence(probs, data):
 
 def kl_divergence_synergy_paper(data_len, probs):
     """
-    compute the kl divergence between the QCBM distribution  and the evenly weighted empirical distribution
+    compute the kl divergence between the QCBM distribution  and the evenly 
+    weighted empirical distribution
 
     Args:
     data_len (int): Number of binary strings of length n
@@ -82,7 +83,8 @@ def kl_divergence_synergy_paper(data_len, probs):
             in our dataset
     """
     CLIP = 1e-8   
-    return -jnp.log(data_len) - ((1 / data_len) * jnp.sum(jnp.log(jnp.clip(probs, CLIP, 1.))))
+    return -jnp.log(data_len) - ((1 / data_len)
+                                 * jnp.sum(jnp.log(jnp.clip(probs, CLIP, 1.))))
 
 
 def plot_BAS(data):
