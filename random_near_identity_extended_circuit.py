@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import optax
 import jax
 import mps_circuit_helpers
-import mps_circuit
+import mps_circuits
 import metrics
 import mps_circuit_helpers as helpers
 
@@ -19,7 +19,16 @@ from MPScumulant import MPS_c
 maxi_bond = 2
 chi = 'BStest/BS_project-2-MPS'    
 m = MPS_c(12, max_bond_dim=maxi_bond)
+mps_circ = None
 
+def mps_to_unitaries_circuit():
+    """
+    
+    """
+    mps_unitaries = helpers.get_mps_unitaries(m)
+    mps_circ = mps_circuits.mps_unitaries_to_circuit(mps_unitaries)
+    qml.drawer.draw_mpl(mps_circ, style="sketch")()
+    return mps_circ
 
 def get_expanded_tape():
     """
@@ -28,9 +37,6 @@ def get_expanded_tape():
     Returns:
         pennylane.tape.qscript.QuantumScript: construct the KAK-decomposed circuit
     """
-    mps_unitaries = helpers.get_mps_unitaries(m)
-    mps_circ = mps_circuit.mps_unitaries_to_circuit(mps_unitaries)
-    qml.drawer.draw_mpl(mps_circ, style="sketch")()
     return qml.transforms.unitary_to_rot.tape_fn(mps_circ._tape)
      
 def get_details_for_su4_matrices(expanded_tape, n_wires):
@@ -97,7 +103,9 @@ def get_extended_circuit(params, params1, shots=None):
                 
         for i in range(len(wires_to_add_su4)):
             qml.SpecialUnitary(params1[i], wires=wires_to_add_su4[i])
-            
+        
+        if shots is not None:
+            return qml.sample()
         return qml.probs(wires=list(range(n_wires)))
     
     return qnode
@@ -113,6 +121,9 @@ def get_data_states(location, columns):
     Returns:
         list: list of list of binary numbers
     """
+    import os
+    print(os.path.abspath("."))
+
     data = np.load(location)
 
     return data.reshape(-1, columns).astype(np.int8)
