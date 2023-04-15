@@ -1,3 +1,12 @@
+"""
+CPEN 400Q work
+This file has helper methods to create as well as train the fully randomly and near 
+unitary initialized circuits, take results from MPS and convert them into a quantum circuit, 
+extend the quantum circuit created from MPS with SU(4) unitaries, and train the extended quantum circuit.
+
+Author : @mushahidkhan835
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pennylane as qml
