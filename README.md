@@ -22,5 +22,6 @@ In order to get an understanding of the project, run the following jupyter noteb
 
 ## Files added
 For this project we added the following files:
- *
-
+ 
+ * random_near_identity_extended_circuit - This file has methods to create as well as train the fully ranodmly and near unitary initialized circuits, take results from MPS and convert them into a quantum circuit, extend the quantum circuit created from MPS with SU(4) unitaries, and train the extended quantum circuit.
+ * 
