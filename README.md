@@ -11,7 +11,8 @@ The solution comprises of three main parts:
 * Presentation Slides
   * PDF file : https://github.com/abhishekabhishek/UnsupGenModbyMPS/blob/master/Final_Presentation.pdf
   * PPTX file: https://github.com/abhishekabhishek/UnsupGenModbyMPS/blob/master/Final_Presentation.pptx
-* Project Report (includes Contributions) - https://github.com/abhishekabhishek/UnsupGenModbyMPS/blob/master/Final_Project_Report.pdf
+* Project Report (includes Contributions)
+  * https://github.com/abhishekabhishek/UnsupGenModbyMPS/blob/master/Final_Project_Report.pdf
 * Software Implementation
   * MPS training - adapted from pre-existing implementation done by authors of the paper:
     > [**Unsupervised Generative Modeling Using Matrix Product States** by *Zhao-Yu Han, Jun Wang, Heng Fan, Lei Wang, Pan Zhang*](https://arxiv.org/abs/1709.01662)
