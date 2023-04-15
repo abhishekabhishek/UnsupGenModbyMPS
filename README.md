@@ -19,3 +19,8 @@ The solution comprises of three main parts:
 
 ## Testing 
 In order to get an understanding of the project, run the following jupyter notebook: sandbox/random_near_identity_extended_circuit.ipynb
+
+## Files added
+For this project we added the following files:
+ *
+
