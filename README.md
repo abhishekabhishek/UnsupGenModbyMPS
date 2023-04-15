@@ -18,4 +18,9 @@ The solution comprises of three main parts:
     > [**Unsupervised Generative Modeling Using Matrix Product States** by *Zhao-Yu Han, Jun Wang, Heng Fan, Lei Wang, Pan Zhang*](https://arxiv.org/abs/1709.01662)
 
 ## Testing 
-In order to get an understanding of the project, run the following jupyter notebooks
+In order to get an understanding of the project, run the following jupyter notebook: sandbox/random_near_identity_extended_circuit.ipynb
+
+## Files added
+For this project we added the following files:
+ *
+
