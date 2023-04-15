@@ -14,7 +14,7 @@ import jax.numpy as jnp
 import optax
 import jax
 import mps_circuit_helpers
-import mps_circuit
+import mps_circuits
 import metrics
 import mps_circuit_helpers as helpers
 

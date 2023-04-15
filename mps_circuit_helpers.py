@@ -64,8 +64,8 @@ def is_unitary(mat):
     assert len(mat.shape) == 2, 'the matrix needs to be 2-dimensional'
     if mat.shape[0] != mat.shape[1]:
         return False
-    else:
-        return (is_left_isometry(mat) and is_right_isometry(mat))
+
+    return (is_left_isometry(mat) and is_right_isometry(mat))
 
 
 def are_isometries(mps, reshape_axis: int = 0):
