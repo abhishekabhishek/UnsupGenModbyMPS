@@ -30,6 +30,7 @@ def get_expanded_tape():
     """
     mps_unitaries = helpers.get_mps_unitaries(m)
     mps_circ = mps_circuit.mps_unitaries_to_circuit(mps_unitaries)
+    qml.drawer.draw_mpl(mps_circ, style="sketch")()
     return qml.transforms.unitary_to_rot.tape_fn(mps_circ._tape)
      
 def get_details_for_su4_matrices(expanded_tape, n_wires):
@@ -76,9 +77,9 @@ def get_extended_circuit(params, params1, shots=None):
         qnode: qnode of circuit
     """
     expanded_tape =  get_expanded_tape()
-    wires_to_add_su4 = get_details_for_su4_matrices()[1]
     n_wires = expanded_tape.num_wires
-
+    wires_to_add_su4 = get_details_for_su4_matrices(expanded_tape, n_wires)[1]
+    
     dev = qml.device("default.qubit.jax", wires=n_wires, shots=shots)
     @qml.qnode(dev, interface="jax")
     def qnode():
@@ -130,8 +131,7 @@ def loss_mps_extended(init_val):
     params = init_val['params']
     params1 = init_val['params1']
 
-    probs = get_extended_circuit(params, params1)
-    probs=jnp.array(probs)
+    probs = get_extended_circuit(params, params1)()
     filter_qc_probs = metrics.filter_probs(probs, get_data_states("BStest/b_s_4_3.npy", 12))
     return metrics.kl_divergence_synergy_paper(22, filter_qc_probs)
 
@@ -184,7 +184,7 @@ def loss_random_near_unitary(init_val):
     filter_qc_probs = metrics.filter_probs(probs, get_data_states("BStest/b_s_4_3.npy", 12))
     return metrics.kl_divergence_synergy_paper(22, filter_qc_probs)
 
-def train_model(init_val, circuit_type="random_near_unitary"):
+def train_model(init_val, n_its=15000, learning_rate=1e-6, circuit_type="random_near_unitary"):
     """
     Train model
 
@@ -195,13 +195,11 @@ def train_model(init_val, circuit_type="random_near_unitary"):
     Returns:
         tuple: update values of parameters after training and the loss at each iteration
     """
-    loss_track = []
-    N_ITS = 15000
-    LEARNING_RATE = 1e-6   
-    opt_exc = optax.adam(LEARNING_RATE)
+    loss_track = []   
+    opt_exc = optax.adam(learning_rate)
     opt_state = opt_exc.init(init_val)
 
-    for _ in tqdm(range(N_ITS)):
+    for _ in tqdm(range(n_its)):
         grads = None
         if circuit_type == "random_near_unitary":
             grads = jax.grad(loss_random_near_unitary)(init_val)
