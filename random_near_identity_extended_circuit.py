@@ -23,7 +23,7 @@ mps_circ = None
 
 def mps_to_unitaries_circuit():
     """
-    Takes results from MPS and converts them to a quantum circuit
+    Takes the result from MPS and convert it to a quantum circuit
     """
     mps_unitaries = helpers.get_mps_unitaries(m)
     mps_circ = mps_circuits.mps_unitaries_to_circuit(mps_unitaries)
