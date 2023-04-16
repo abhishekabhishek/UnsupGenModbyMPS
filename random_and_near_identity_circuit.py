@@ -52,7 +52,9 @@ def get_random_initialized_circuit(weights, shots = None, wires = 12):
     circuit
 
     Args:
-        weights (list): List of weights
+        weights (list): list of weights
+        shots (int): number of shots for quantum circuit. Defaults to None.
+        wires (int): number of wires for quantum circuit. Defaults to 12.
 
     Returns:
         qml.QNode : Initialized quantum circuit
@@ -115,7 +117,6 @@ def get_mps_circ_extended(weights, n_wires=12, shots=None):
 
     Args:
         weights (list): list of weights
-        mps (Matrix product State): matrix product state
         n_wires (int, optional): number of wires. Defaults to 12.
         shots (_type_, optional): number of shots. Defaults to None.
 
@@ -188,12 +189,13 @@ def loss_mps_extended(weights):
     return metrics.kl_divergence_synergy_paper(22, filter_qc_probs)
 
 
-def plot_KL_divergence( loss_track, title):
+def plot_KL_divergence(loss_track, title):
     """
     Plot the KL divergence of model
 
     Args:
         loss_track (list): list of KL divergence for each iteration
+        title (string): name of model
     """
     plt.plot(loss_track)
     plt.title(f"Training KL - Divergence:{title}")
@@ -202,12 +204,13 @@ def plot_KL_divergence( loss_track, title):
     plt.yscale("log")
 
     
-def train_model(weights, mps=None, circuit_type="random_near_unitary"):
+def train_model(weights, circuit_type="random_near_unitary"):
     """
     Train on circuit using weights
 
     Args:
         weights (list): list of weights
+        circuit_type (string): type of circuit to train
 
     Returns:
         tuple: a tuple of the updated weights and kl divergence for each iteration
