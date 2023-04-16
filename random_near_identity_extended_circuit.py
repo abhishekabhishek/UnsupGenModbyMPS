@@ -1,3 +1,12 @@
+"""
+CPEN 400Q work
+This file has helper methods to create as well as train the fully randomly and near 
+unitary initialized circuits, take results from MPS and convert them into a quantum circuit, 
+extend the quantum circuit created from MPS with SU(4) unitaries, and train the extended quantum circuit.
+
+Author : @mushahidkhan835
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pennylane as qml
@@ -6,7 +15,7 @@ import jax.numpy as jnp
 import optax
 import jax
 import mps_circuit_helpers
-import mps_circuit
+import mps_circuits
 import metrics
 import mps_circuit_helpers as helpers
 
@@ -19,7 +28,16 @@ from MPScumulant import MPS_c
 maxi_bond = 2
 chi = 'BStest/BS_project-2-MPS'    
 m = MPS_c(12, max_bond_dim=maxi_bond)
+mps_circ = None
 
+def mps_to_unitaries_circuit():
+    """
+    Takes the result from MPS and convert it to a quantum circuit
+    """
+    mps_unitaries = helpers.get_mps_unitaries(m)
+    mps_circ = mps_circuits.mps_unitaries_to_circuit(mps_unitaries)
+    qml.drawer.draw_mpl(mps_circ, style="sketch")()
+    return mps_circ
 
 def get_expanded_tape():
     """
@@ -28,8 +46,6 @@ def get_expanded_tape():
     Returns:
         pennylane.tape.qscript.QuantumScript: construct the KAK-decomposed circuit
     """
-    mps_unitaries = helpers.get_mps_unitaries(m)
-    mps_circ = mps_circuit.mps_unitaries_to_circuit(mps_unitaries)
     return qml.transforms.unitary_to_rot.tape_fn(mps_circ._tape)
      
 def get_details_for_su4_matrices(expanded_tape, n_wires):
@@ -76,9 +92,9 @@ def get_extended_circuit(params, params1, shots=None):
         qnode: qnode of circuit
     """
     expanded_tape =  get_expanded_tape()
-    wires_to_add_su4 = get_details_for_su4_matrices()[1]
     n_wires = expanded_tape.num_wires
-
+    wires_to_add_su4 = get_details_for_su4_matrices(expanded_tape, n_wires)[1]
+    
     dev = qml.device("default.qubit.jax", wires=n_wires, shots=shots)
     @qml.qnode(dev, interface="jax")
     def qnode():
@@ -96,7 +112,9 @@ def get_extended_circuit(params, params1, shots=None):
                 
         for i in range(len(wires_to_add_su4)):
             qml.SpecialUnitary(params1[i], wires=wires_to_add_su4[i])
-            
+        
+        if shots is not None:
+            return qml.sample()
         return qml.probs(wires=list(range(n_wires)))
     
     return qnode
@@ -112,6 +130,9 @@ def get_data_states(location, columns):
     Returns:
         list: list of list of binary numbers
     """
+    import os
+    print(os.path.abspath("."))
+
     data = np.load(location)
 
     return data.reshape(-1, columns).astype(np.int8)
@@ -130,8 +151,7 @@ def loss_mps_extended(init_val):
     params = init_val['params']
     params1 = init_val['params1']
 
-    probs = get_extended_circuit(params, params1)
-    probs=jnp.array(probs)
+    probs = get_extended_circuit(params, params1)()
     filter_qc_probs = metrics.filter_probs(probs, get_data_states("BStest/b_s_4_3.npy", 12))
     return metrics.kl_divergence_synergy_paper(22, filter_qc_probs)
 
@@ -184,7 +204,7 @@ def loss_random_near_unitary(init_val):
     filter_qc_probs = metrics.filter_probs(probs, get_data_states("BStest/b_s_4_3.npy", 12))
     return metrics.kl_divergence_synergy_paper(22, filter_qc_probs)
 
-def train_model(init_val, circuit_type="random_near_unitary"):
+def train_model(init_val, n_its=15000, learning_rate=1e-6, circuit_type="random_near_unitary"):
     """
     Train model
 
@@ -195,13 +215,11 @@ def train_model(init_val, circuit_type="random_near_unitary"):
     Returns:
         tuple: update values of parameters after training and the loss at each iteration
     """
-    loss_track = []
-    N_ITS = 15000
-    LEARNING_RATE = 1e-6   
-    opt_exc = optax.adam(LEARNING_RATE)
+    loss_track = []   
+    opt_exc = optax.adam(learning_rate)
     opt_state = opt_exc.init(init_val)
 
-    for _ in tqdm(range(N_ITS)):
+    for _ in tqdm(range(n_its)):
         grads = None
         if circuit_type == "random_near_unitary":
             grads = jax.grad(loss_random_near_unitary)(init_val)
