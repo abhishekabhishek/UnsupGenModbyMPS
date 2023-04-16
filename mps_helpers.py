@@ -68,6 +68,29 @@ def tn_to_mps(mps: tn.FiniteMPS):
     return mps_c
 
 
+def gate_to_tensor(gate: np.ndarray):
+    """
+    Convert a two-qubit unitary gates into an order-4 tensor which can be
+    applied as a two-site gate to the MPS
+
+    Args:
+        gate (np.ndarray): 4x4 matrix of the two-qubit gate
+
+    Returns:
+        mpo (np.ndarray): 2x2x2x2 order-4 tensor two-site MPO
+    """
+    tn_gate = np.zeros((2, 2, 2, 2))
+
+    # trying to do the matrix to tensor mapping manually to try different
+    # combinations - gives the same result as reshape
+    tn_gate[:, :, 0, 0] = gate[0].reshape(2, 2)
+    tn_gate[:, :, 0, 1] = gate[1].reshape(2, 2)
+    tn_gate[:, :, 1, 0] = gate[2].reshape(2, 2)
+    tn_gate[:, :, 1, 1] = gate[3].reshape(2, 2)
+
+    return tn_gate
+
+
 def apply_conjugate_unitaries(mps_unitaries: list, mps: tn.FiniteMPS,
                               max_singular_value: int = 4):
     """
@@ -99,11 +122,11 @@ def apply_conjugate_unitaries(mps_unitaries: list, mps: tn.FiniteMPS,
 
         # TODO not sure on the correctness of this reshaping but the two-site
         # operator needs to be rank 4 and this is the only valid way
-        gate = gate.reshape(2, 2, 2, 2)
+        tn_gate = gate_to_tensor(gate)
 
         # need to set the center position in order for SVD truncation to work
         mps.center_position = idx
         mps.position(idx)
 
-        mps.apply_two_site_gate(gate, site1=idx, site2=idx+1,
+        mps.apply_two_site_gate(tn_gate, site1=idx, site2=idx+1,
                                 max_singular_values=max_singular_value)
