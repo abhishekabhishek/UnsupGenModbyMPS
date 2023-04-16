@@ -33,3 +33,5 @@ simplest multi-qubit gate mapping
 ## Testing 
 In order to get an understanding of the project, run the following jupyter notebook: sandbox/random_near_identity_extended_circuit.ipynb 
 > https://github.com/abhishekabhishek/UnsupGenModbyMPS/blob/master/sandbox/random_near_identity_extended_circuit.ipynb
+
+Required installations are in the requirements.txt
