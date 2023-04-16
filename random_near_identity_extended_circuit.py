@@ -210,6 +210,8 @@ def train_model(init_val, n_its=15000, learning_rate=1e-6, circuit_type="random_
 
     Args:
         init_val (dictionary): dictionary of parameters to train
+        n_init (int): number of iterations. Defaults to 15000.
+        learning_rate (float): learning rate. Defaults to 1e-6.
         circuit_type (str, optional): the type of circuit to run. Defaults to "random_near_unitary".
 
     Returns:
