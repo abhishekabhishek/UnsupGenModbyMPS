@@ -26,6 +26,8 @@ The solution comprises of three main parts:
       * mps_circuits.py - This file hs Pennylane implementation of quantum circuits constructed using the classically.
       * metrics.py - This file has helper functions to calculate the metrics such as KL-divergence of the models.
       * BStest.b_s_4_3.npy - This file is the data set of 4 x 3 bars and stripes
+      * mps_circuit_helpers.py  - Helper functions to map a trained MPS model to a quantum circuit using the
+simplest multi-qubit gate mapping
      trained MPS
 
 ## Testing 
